@@ -28,7 +28,7 @@ jobs:
       - name: Producer
         id: produce
         run: | 
-          docker run -v $(pwd):/mnt/vol -v /cvmfs:/cvmfs:shared -w /home/cmsusr gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest /bin/bash /mnt/vol/commands.sh 100
+          docker run -v $(pwd):/mnt/vol -v /cvmfs:/cvmfs:shared -w /home/cmsusr gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest /bin/bash /mnt/vol/commands.sh 100000
           echo ls -l  `ls -l `
           cp *.root outputs
       # run the plotting script
