@@ -31,6 +31,9 @@ sed -i "s/$eventline/process.maxEvents = cms.untracked.PSet( input = cms.untrack
 # remove the connection to cvmfs, for GT access from docker container without cvmfs mount 
 if [ "$CVMFS_MOUNTED" = false ] ; then
    sed -i "s/process.GlobalTag.connect/#process.GlobalTag.connect/g" $config
+else
+   ln -sf /cvmfs/cms-opendata-conddb.cern.ch/GR_R_44_V15 GR_R_44_V15
+   ln -sf /cvmfs/cms-opendata-conddb.cern.ch/GR_R_44_V15.db GR_R_44_V15.db
 fi
 cmsRun $config
 
