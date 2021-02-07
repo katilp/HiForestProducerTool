@@ -1,0 +1,45 @@
+name: Test HI 2011 workflow on plain docker cvmfs mounted
+on:
+  pull_request:
+    branches:
+    - 2011
+jobs:
+  test_workflow:
+    runs-on: ubuntu-latest
+    name: HiForest 2011 test - plain docker with cvmfs mounted
+    steps:
+      # chmod of the script before getting to the container
+      - uses: actions/checkout@v2
+      - name: Prepare
+        run: |
+          mkdir outputs
+          pwd
+          ls -l
+      - uses: cvmfs-contrib/github-action-cvmfs@v2
+      - name: Test CernVM-FS
+        run: |
+          echo "### Dump default.local ###"
+          cat /etc/cvmfs/default.local
+          echo "### Test /cvmfs/cms.cern.ch ###"
+          ls /cvmfs/cms.cern.ch
+          echo "### /cvmfs/cms-opendata-conddb.cern.ch/ ###"
+          ls /cvmfs/cms-opendata-conddb.cern.ch/    
+      # run the container with the script in the repository
+      - name: Producer
+        id: produce
+        run: | 
+          docker run -v $(pwd):/mnt/vol -v /cvmfs:/cvmfs:shared -w /home/cmsusr gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest /bin/bash /mnt/vol/commands.sh 100
+          echo ls -l  `ls -l `
+          cp *.root outputs
+      # run the plotting script
+      - name: Plotter
+        id: plot
+        run: |
+          docker run -v $(pwd):/mnt/vol -v /cvmfs:/cvmfs:shared -w /home/cmsusr gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest /bin/bash /mnt/vol/plot.sh
+          cp *.png outputs
+      # upload output file
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: outputs/
